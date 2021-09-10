@@ -20,9 +20,9 @@ load(
 )
 load(
     "//rust/private:clippy.bzl",
+    _capture_clippy_output = "capture_clippy_output",
     _rust_clippy = "rust_clippy",
     _rust_clippy_aspect = "rust_clippy_aspect",
-    _capture_clippy_output = "capture_clippy_output"
 )
 load("//rust/private:common.bzl", _rust_common = "rust_common")
 load(
