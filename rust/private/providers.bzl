@@ -68,3 +68,10 @@ StdLibInfo = provider(
         "std_rlibs": "List[File]: All `.rlib` files",
     },
 )
+
+ClippyInfo = provider(
+    doc = "Provides information on a clippy run.",
+    fields = {
+        "output": "File with the clippy output.",
+    },
+)

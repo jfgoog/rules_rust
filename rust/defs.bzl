@@ -22,6 +22,7 @@ load(
     "//rust/private:clippy.bzl",
     _rust_clippy = "rust_clippy",
     _rust_clippy_aspect = "rust_clippy_aspect",
+    _capture_clippy_output = "capture_clippy_output"
 )
 load("//rust/private:common.bzl", _rust_common = "rust_common")
 load(
@@ -93,6 +94,9 @@ rust_clippy_aspect = _rust_clippy_aspect
 # See @rules_rust//rust/private:clippy.bzl for a complete description.
 
 rust_clippy = _rust_clippy
+# See @rules_rust//rust/private:clippy.bzl for a complete description.
+
+capture_clippy_output = _capture_clippy_output
 # See @rules_rust//rust/private:clippy.bzl for a complete description.
 
 error_format = _error_format
