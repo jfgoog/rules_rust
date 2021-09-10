@@ -57,7 +57,7 @@ def _get_clippy_ready_crate_info(target, aspect_ctx):
 def _clippy_aspect_impl(target, ctx):
     crate_info = _get_clippy_ready_crate_info(target, ctx)
     if not crate_info:
-        return []
+        return [ClippyInfo(output = depset([]))]
 
     toolchain = find_toolchain(ctx)
     cc_toolchain, feature_configuration = find_cc_toolchain(ctx)
