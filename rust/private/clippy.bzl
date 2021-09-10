@@ -164,6 +164,10 @@ rust_clippy_aspect = aspect(
     fragments = ["cpp"],
     host_fragments = ["cpp"],
     attrs = {
+        "_capture_output": attr.label(
+            doc = "If true, write clippy output as a build output, rather than printing it",
+            default = Label("//third_party/bazel_rules/rules_rust:capture_clippy_output"),
+        ),
         "_cc_toolchain": attr.label(
             doc = (
                 "Required attribute to access the cc_toolchain. See [Accessing the C++ toolchain]" +
@@ -186,10 +190,6 @@ rust_clippy_aspect = aspect(
             default = Label("//util/process_wrapper"),
             executable = True,
             cfg = "exec",
-        ),
-        "_capture_output": attr.label(
-            doc = "If true, write clippy output as a build output, rather than printing it",
-            default = Label("//third_party/bazel_rules/rules_rust:capture_clippy_output"),
         ),
     },
     provides = [ClippyInfo],
