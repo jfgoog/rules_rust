@@ -22,6 +22,7 @@ load(
     "construct_arguments",
 )
 load("//rust/private:utils.bzl", "determine_output_hash", "find_cc_toolchain", "find_toolchain")
+load(":providers.bzl", "ClippyInfo")
 
 ClippyConfigInfo = provider(
     doc = "Configures how to run clippy",
