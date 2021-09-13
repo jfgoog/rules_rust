@@ -15,13 +15,13 @@
 """A module defining clippy rules"""
 
 load("//rust/private:common.bzl", "rust_common")
+load("//rust/private:providers.bzl", "ClippyInfo")
 load(
     "//rust/private:rustc.bzl",
     "collect_deps",
     "collect_inputs",
     "construct_arguments",
 )
-load("//rust/private:providers.bzl", "ClippyInfo")
 load("//rust/private:utils.bzl", "determine_output_hash", "find_cc_toolchain", "find_toolchain")
 
 CaptureClippyOutputInfo = provider(
