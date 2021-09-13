@@ -26,7 +26,7 @@ load("//rust/private:providers.bzl", "ClippyInfo")
 
 CaptureClippyOutputInfo = provider(
     doc = "Configures how to run clippy",
-    fields = {"capture_output": "If true, write clippy lints as a build output rather than printing them."},
+    fields = {"capture_output": "If true, write clippy lints as a build output rather than printing them, using the configured error_format"},
 )
 
 def _get_clippy_ready_crate_info(target, aspect_ctx):
@@ -166,7 +166,7 @@ rust_clippy_aspect = aspect(
     host_fragments = ["cpp"],
     attrs = {
         "_capture_output": attr.label(
-            doc = "If true, write clippy output as a build output, rather than printing it",
+            doc = "If true, write clippy output as a build output, rather than printing it, using the configured error_format",
             default = Label("//:capture_clippy_output"),
         ),
         "_cc_toolchain": attr.label(
