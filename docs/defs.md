@@ -11,6 +11,7 @@
 * [rust_test_suite](#rust_test_suite)
 * [error_format](#error_format)
 * [extra_rustc_flags](#extra_rustc_flags)
+* [capture_clippy_output](#capture_clippy_output)
 
 <a id="#error_format"></a>
 

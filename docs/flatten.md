@@ -3,6 +3,7 @@
 * [CrateInfo](#CrateInfo)
 * [DepInfo](#DepInfo)
 * [StdLibInfo](#StdLibInfo)
+* [capture_clippy_output](#capture_clippy_output)
 * [cargo_bootstrap_repository](#cargo_bootstrap_repository)
 * [cargo_build_script](#cargo_build_script)
 * [cargo_env](#cargo_env)
