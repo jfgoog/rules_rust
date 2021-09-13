@@ -20,7 +20,7 @@
 capture_clippy_output(<a href="#capture_clippy_output-name">name</a>)
 </pre>
 
-Control whether to print clippy output or store it to a file.
+Control whether to print clippy output or store it to a file, using the configured error_format.
 
 **ATTRIBUTES**
 

@@ -292,7 +292,7 @@ def _capture_clippy_output_impl(ctx):
     return [CaptureClippyOutputInfo(capture_output = ctx.build_setting_value)]
 
 capture_clippy_output = rule(
-    doc = "Control whether to print clippy output or store it to a file.",
+    doc = "Control whether to print clippy output or store it to a file, using the configured error_format.",
     implementation = _capture_clippy_output_impl,
     build_setting = config.bool(flag = True),
 )
