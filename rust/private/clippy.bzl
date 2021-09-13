@@ -81,14 +81,6 @@ def _clippy_aspect_impl(target, ctx):
         build_info,
     )
 
-    capture_output = ctx.attr._capture_output[CaptureClippyOutputInfo].capture_output
-    if capture_output:
-        clippy_out = ctx.actions.declare_file(ctx.label.name + ".clippy.out")
-    else:
-        # A marker file indicating clippy has executed successfully.
-        # This file is necessary because "ctx.actions.run" mandates an output.
-        clippy_out = ctx.actions.declare_file(ctx.label.name + ".clippy.ok")
-
     args, env = construct_arguments(
         ctx = ctx,
         attr = ctx.rule.attr,
@@ -107,11 +99,22 @@ def _clippy_aspect_impl(target, ctx):
         emit = ["dep-info", "metadata"],
     )
 
-    if capture_output:
+    if crate_info.is_test:
+        args.rustc_flags.add("--test")
+
+    if ctx.attr._capture_output[CaptureClippyOutputInfo].capture_output:
+        clippy_out = ctx.actions.declare_file(ctx.label.name + ".clippy.out")
+        args.process_wrapper_flags.add("--stdout-file", clippy_out.path)
+
         # If we are capturing the output, we want the build system to be able to keep going
         # and consume the output. Some clippy lints are denials, so we treat them as warnings.
         args.rustc_flags.add("-Wclippy::all")
     else:
+        # A marker file indicating clippy has executed successfully.
+        # This file is necessary because "ctx.actions.run" mandates an output.
+        clippy_out = ctx.actions.declare_file(ctx.label.name + ".clippy.ok")
+        args.process_wrapper_flags.add("--touch-file", clippy_out.path)
+
         # Turn any warnings from clippy or rustc into an error, as otherwise
         # Bazel will consider the execution result of the aspect to be "success",
         # and Clippy won't be re-triggered unless the source file is modified.
@@ -125,14 +128,6 @@ def _clippy_aspect_impl(target, ctx):
         else:
             # fail on any warning
             args.rustc_flags.add("-Dwarnings")
-
-    if crate_info.is_test:
-        args.rustc_flags.add("--test")
-
-    if capture_output:
-        args.process_wrapper_flags.add("--stdout-file", clippy_out.path)
-    else:
-        args.process_wrapper_flags.add("--touch-file", clippy_out.path)
 
     # Upstream clippy requires one of these two filenames or it silently uses
     # the default config. Enforce the naming so users are not confused.
