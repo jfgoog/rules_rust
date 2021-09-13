@@ -21,8 +21,8 @@ load(
     "collect_inputs",
     "construct_arguments",
 )
-load("//rust/private:utils.bzl", "determine_output_hash", "find_cc_toolchain", "find_toolchain")
 load("//rust/private:providers.bzl", "ClippyInfo")
+load("//rust/private:utils.bzl", "determine_output_hash", "find_cc_toolchain", "find_toolchain")
 
 CaptureClippyOutputInfo = provider(
     doc = "Configures how to run clippy",
