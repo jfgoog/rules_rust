@@ -24,7 +24,7 @@ load(
 load("//rust/private:utils.bzl", "determine_output_hash", "find_cc_toolchain", "find_toolchain")
 load("//rust/private:providers.bzl", "ClippyInfo")
 
-ClippyConfigInfo = provider(
+CaptureClippyOutputInfo = provider(
     doc = "Configures how to run clippy",
     fields = {"capture_output": "If true, write clippy lints as a build output rather than printing them."},
 )
@@ -81,7 +81,7 @@ def _clippy_aspect_impl(target, ctx):
         build_info,
     )
 
-    capture_output = ctx.attr._capture_output[ClippyConfigInfo].capture_output
+    capture_output = ctx.attr._capture_output[CaptureClippyOutputInfo].capture_output
     if capture_output:
         clippy_out = ctx.actions.declare_file(ctx.label.name + ".clippy.out")
     else:
@@ -292,9 +292,9 @@ def _capture_clippy_output_impl(ctx):
         ctx (ctx): The rule's context object
 
     Returns:
-        list: A list containing the ClippyConfigInfo provider
+        list: A list containing the CaptureClippyOutputInfo provider
     """
-    return [ClippyConfigInfo(capture_output = ctx.build_setting_value)]
+    return [CaptureClippyOutputInfo(capture_output = ctx.build_setting_value)]
 
 capture_clippy_output = rule(
     doc = "Control whether to print clippy output or store it to a file.",
