@@ -49,6 +49,24 @@
 * [rustfmt_test](#rustfmt_test)
 
 
+<a id="#capture_clippy_output"></a>
+
+## capture_clippy_output
+
+<pre>
+capture_clippy_output(<a href="#capture_clippy_output-name">name</a>)
+</pre>
+
+Control whether to print clippy output or store it to a file.
+
+**ATTRIBUTES**
+
+
+| Name  | Description | Type | Mandatory | Default |
+| :------------- | :------------- | :------------- | :------------- | :------------- |
+| <a id="capture_clippy_output-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/docs/build-ref.html#name">Name</a> | required |  |
+
+
 <a id="#cargo_bootstrap_repository"></a>
 
 ## cargo_bootstrap_repository
