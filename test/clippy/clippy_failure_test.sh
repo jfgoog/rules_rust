@@ -27,8 +27,11 @@ function check_build_result() {
   local ret=0
   echo -n "Testing ${2}... "
   ADDITIONAL_ARGS=()
-  if [[ -n "${3-}" ]]; then
-    ADDITIONAL_ARGS+=("--@rules_rust//:clippy.toml=${3}")
+  if [[ "${3-False}" != "False" ]]; then
+    ADDITIONAL_ARGS+=("--@rules_rust//:capture_clippy_output=${3}")
+  fi
+  if [[ -n "${4-}" ]]; then
+    ADDITIONAL_ARGS+=("--@rules_rust//:clippy.toml=${4}")
   fi
   (bazel build "${ADDITIONAL_ARGS[@]}" //test/clippy:"${2}" &> /dev/null) || ret="$?" && true
   if [[ "${ret}" -ne "${1}" ]]; then
@@ -77,9 +80,15 @@ EOF
   check_build_result $BUILD_FAILED bad_library_clippy
   check_build_result $BUILD_FAILED bad_test_clippy
 
+  # When capturing output, clippy errors are treated as warnings and the build
+  # should succeed.
+  check_build_result $BUILD_OK bad_binary_clippy True
+  check_build_result $BUILD_OK bad_library_clippy True
+  check_build_result $BUILD_OK bad_test_clippy True
+
   # Test that we can make the ok_library_clippy fail when using an extra config file.
   # Proves that the config file is used and overrides default settings.
-  check_build_result $BUILD_FAILED ok_library_clippy //too_many_args:clippy.toml
+  check_build_result $BUILD_FAILED ok_library_clippy False //too_many_args:clippy.toml
 }
 
 test_all
