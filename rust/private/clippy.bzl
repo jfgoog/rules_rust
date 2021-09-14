@@ -15,7 +15,7 @@
 """A module defining clippy rules"""
 
 load("//rust/private:common.bzl", "rust_common")
-load("//rust/private:providers.bzl", "ClippyInfo")
+load("//rust/private:providers.bzl", "CaptureClippyOutputInfo", "ClippyInfo")
 load(
     "//rust/private:rustc.bzl",
     "collect_deps",
@@ -23,11 +23,6 @@ load(
     "construct_arguments",
 )
 load("//rust/private:utils.bzl", "determine_output_hash", "find_cc_toolchain", "find_toolchain")
-
-CaptureClippyOutputInfo = provider(
-    doc = "Configures how to run clippy",
-    fields = {"capture_output": "If true, write clippy lints as a build output rather than printing them, using the configured error_format"},
-)
 
 def _get_clippy_ready_crate_info(target, aspect_ctx):
     """Check that a target is suitable for clippy and extract the `CrateInfo` provider from it.
@@ -161,7 +156,7 @@ rust_clippy_aspect = aspect(
     host_fragments = ["cpp"],
     attrs = {
         "_capture_output": attr.label(
-            doc = "If true, write clippy output as a build output, rather than printing it, using the configured error_format",
+            doc = "Value of the `capture_clippy_output` build setting",
             default = Label("//:capture_clippy_output"),
         ),
         "_cc_toolchain": attr.label(

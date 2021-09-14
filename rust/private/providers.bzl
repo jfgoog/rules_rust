@@ -69,6 +69,11 @@ StdLibInfo = provider(
     },
 )
 
+CaptureClippyOutputInfo = provider(
+    doc = "Value of the `capture_clippy_output` build setting",
+    fields = {"capture_output": "Value of the `capture_clippy_output` build setting"},
+)
+
 ClippyInfo = provider(
     doc = "Provides information on a clippy run.",
     fields = {
