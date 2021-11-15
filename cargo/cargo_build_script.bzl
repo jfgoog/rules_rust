@@ -169,6 +169,7 @@ def _build_script_impl(ctx):
         tools = tools,
         inputs = build_script_inputs,
         mnemonic = "CargoBuildScriptRun",
+        progress_message = "Running Cargo build script {}".format(pkg_name),
         env = env,
     )
 
@@ -278,7 +279,7 @@ def cargo_build_script(
     ```python
     package(default_visibility = ["//visibility:public"])
 
-    load("@rules_rust//rust:rust.bzl", "rust_binary", "rust_library")
+    load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library")
     load("@rules_rust//cargo:cargo_build_script.bzl", "cargo_build_script")
 
     # This will run the build script from the root of the workspace, and
@@ -336,19 +337,23 @@ def cargo_build_script(
     if "CARGO_CRATE_NAME" not in rustc_env:
         rustc_env["CARGO_CRATE_NAME"] = name_to_crate_name(_name_to_pkg_name(name))
 
+    binary_tags = [tag for tag in tags or []]
+    if "manual" not in binary_tags:
+        binary_tags.append("manual")
+
     rust_binary(
-        name = name + "_script_",
+        name = name + "_",
         crate_features = crate_features,
         version = version,
         deps = deps,
         data = data,
         rustc_env = rustc_env,
-        tags = ["manual"],
+        tags = binary_tags,
         **kwargs
     )
     _build_script_run(
         name = name,
-        script = ":%s_script_" % name,
+        script = ":{}_".format(name),
         crate_features = crate_features,
         version = version,
         build_script_env = build_script_env,
