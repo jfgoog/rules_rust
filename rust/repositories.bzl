@@ -79,20 +79,18 @@ def rust_repositories(
     maybe(
         http_archive,
         name = "rules_cc",
-        url = "https://github.com/bazelbuild/rules_cc/archive/624b5d59dfb45672d4239422fa1e3de1822ee110.zip",
-        sha256 = "8c7e8bf24a2bf515713445199a677ee2336e1c487fa1da41037c6026de04bbc3",
-        strip_prefix = "rules_cc-624b5d59dfb45672d4239422fa1e3de1822ee110",
-        type = "zip",
+        urls = ["https://github.com/bazelbuild/rules_cc/releases/download/0.0.1/rules_cc-0.0.1.tar.gz"],
+        sha256 = "4dccbfd22c0def164c8f47458bd50e0c7148f3d92002cdb459c2a96a68498241",
     )
 
     maybe(
         http_archive,
         name = "bazel_skylib",
-        sha256 = "1c531376ac7e5a180e0237938a2536de0c54d93f5c278634818e0efc952dd56c",
         urls = [
-            "https://github.com/bazelbuild/bazel-skylib/releases/download/1.0.3/bazel-skylib-1.0.3.tar.gz",
-            "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.0.3/bazel-skylib-1.0.3.tar.gz",
+            "https://github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
+            "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
         ],
+        sha256 = "c6966ec828da198c5d9adbaa94c05e3a1c7f21bd012a0b29ba8ddbccb2c93b0d",
     )
 
     for exec_triple, name in DEFAULT_TOOLCHAIN_TRIPLES.items():
@@ -172,6 +170,12 @@ rust_toolchain_repository = repository_rule(
         "selection from toolchain fetching."
     ),
     attrs = {
+        "auth": attr.string_dict(
+            doc = (
+                "Auth object compatible with repository_ctx.download to use when downloading files. " +
+                "See https://docs.bazel.build/versions/main/skylark/lib/repository_ctx.html#download for more details."
+            ),
+        ),
         "dev_components": attr.bool(
             doc = "Whether to download the rustc-dev components (defaults to False). Requires version to be \"nightly\".",
             default = False,
@@ -257,7 +261,8 @@ def rust_repository_set(
         edition = None,
         dev_components = False,
         sha256s = None,
-        urls = DEFAULT_STATIC_RUST_URL_TEMPLATES):
+        urls = DEFAULT_STATIC_RUST_URL_TEMPLATES,
+        auth = None):
     """Assembles a remote repository for the given toolchain params, produces a proxy repository \
     to contain the toolchain declaration, and registers the toolchains.
 
@@ -280,6 +285,8 @@ def rust_repository_set(
         sha256s (str, optional): A dict associating tool subdirectories to sha256 hashes. See
             [rust_repositories](#rust_repositories) for more details.
         urls (list, optional): A list of mirror urls containing the tools from the Rust-lang static file server. These must contain the '{}' used to substitute the tool being fetched (using .format). Defaults to ['https://static.rust-lang.org/dist/{}.tar.gz']
+        auth (dict): Auth object compatible with repository_ctx.download to use when downloading files.
+            See https://docs.bazel.build/versions/main/skylark/lib/repository_ctx.html#download for more details.
     """
 
     rust_toolchain_repository(
@@ -295,6 +302,7 @@ def rust_repository_set(
         dev_components = dev_components,
         sha256s = sha256s,
         urls = urls,
+        auth = auth,
     )
 
     rust_toolchain_repository_proxy(

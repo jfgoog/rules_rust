@@ -22,7 +22,12 @@ load(
     "collect_inputs",
     "construct_arguments",
 )
-load("//rust/private:utils.bzl", "determine_output_hash", "find_cc_toolchain", "find_toolchain")
+load(
+    "//rust/private:utils.bzl",
+    "determine_output_hash",
+    "find_cc_toolchain",
+    "find_toolchain",
+)
 
 def _get_clippy_ready_crate_info(target, aspect_ctx):
     """Check that a target is suitable for clippy and extract the `CrateInfo` provider from it.
@@ -58,19 +63,24 @@ def _clippy_aspect_impl(target, ctx):
     cc_toolchain, feature_configuration = find_cc_toolchain(ctx)
     crate_type = crate_info.type
 
-    dep_info, build_info = collect_deps(
+    dep_info, build_info, linkstamps = collect_deps(
         label = ctx.label,
         deps = crate_info.deps,
         proc_macro_deps = crate_info.proc_macro_deps,
         aliases = crate_info.aliases,
+        # Clippy doesn't need to invoke transitive linking, therefore doesn't need linkstamps.
+        are_linkstamps_supported = False,
+        make_rust_providers_target_independent = toolchain._incompatible_make_rust_providers_target_independent,
     )
 
-    compile_inputs, out_dir, build_env_files, build_flags_files = collect_inputs(
+    compile_inputs, out_dir, build_env_files, build_flags_files, linkstamp_outs = collect_inputs(
         ctx,
         ctx.rule.file,
         ctx.rule.files,
+        linkstamps,
         toolchain,
         cc_toolchain,
+        feature_configuration,
         crate_info,
         dep_info,
         build_info,
@@ -86,6 +96,7 @@ def _clippy_aspect_impl(target, ctx):
         feature_configuration = feature_configuration,
         crate_info = crate_info,
         dep_info = dep_info,
+        linkstamp_outs = linkstamp_outs,
         output_hash = determine_output_hash(crate_info.root),
         rust_flags = [],
         out_dir = out_dir,
@@ -97,8 +108,10 @@ def _clippy_aspect_impl(target, ctx):
     if crate_info.is_test:
         args.rustc_flags.add("--test")
 
+    # For remote execution purposes, the clippy_out file must be a sibling of crate_info.output
+    # or rustc may fail to create intermediate output files because the directory does not exist.
     if ctx.attr._capture_output[CaptureClippyOutputInfo].capture_output:
-        clippy_out = ctx.actions.declare_file(ctx.label.name + ".clippy.out")
+        clippy_out = ctx.actions.declare_file(ctx.label.name + ".clippy.out", sibling = crate_info.output)
         args.process_wrapper_flags.add("--stdout-file", clippy_out.path)
 
         # If we are capturing the output, we want the build system to be able to keep going
@@ -107,7 +120,7 @@ def _clippy_aspect_impl(target, ctx):
     else:
         # A marker file indicating clippy has executed successfully.
         # This file is necessary because "ctx.actions.run" mandates an output.
-        clippy_out = ctx.actions.declare_file(ctx.label.name + ".clippy.ok")
+        clippy_out = ctx.actions.declare_file(ctx.label.name + ".clippy.ok", sibling = crate_info.output)
         args.process_wrapper_flags.add("--touch-file", clippy_out.path)
 
         # Turn any warnings from clippy or rustc into an error, as otherwise
